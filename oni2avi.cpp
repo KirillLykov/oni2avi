@@ -99,6 +99,8 @@ public:
       imageGen.GetMetaData(xImageMap);
       XnRGB24Pixel* imgData = const_cast<XnRGB24Pixel*>(xImageMap.RGB24Data());
       cv::Mat image(frame_height, frame_width, CV_8UC3, reinterpret_cast<void*>(imgData));
+
+      cv::cvtColor(image, image, CV_BGR2RGB); // opencv image format is bgr
       imgWriter << image.clone();
 
       // save depth

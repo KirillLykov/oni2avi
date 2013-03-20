@@ -13,7 +13,7 @@ EXE =   $(ROOT)
 
 INCLUDES = -I/opt/local/include/ni -I/opt/local/include/opencv
 LIBS_PATH = -L/opt/local/lib/
-LIBS = -lOpenNI -lboost_program_options-mt -lopencv_video -lopencv_highgui -lopencv_core
+LIBS = -lOpenNI -lboost_program_options-mt -lopencv_video -lopencv_highgui -lopencv_core -lopencv_imgproc
 
 CC = g++
 CCFLAGS = -O2
