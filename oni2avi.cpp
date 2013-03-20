@@ -15,9 +15,7 @@ namespace po = boost::program_options;
 #include <XnCppWrapper.h>
 
 // OpenCV
-#include <cv.h>
-#include <highgui.h>
-
+#include <opencv2/opencv.hpp>
 
 class CodecName2FourCC
 {
@@ -81,8 +79,7 @@ public:
     getOutputFileNames(outputFile, outputFileImg, outputFileDepth);
 
     cv::VideoWriter imgWriter(outputFileImg, m_codecName2Code(codecName), fps, cvSize(frame_width, frame_height), 1);
-    //TODO depth doesn't work yet, will fix it soon
-    //cv::VideoWriter depthWriter(outputFileDepth, m_codecName2Code(codecName), fps, cvSize(frame_width, frame_height), 1);
+    cv::VideoWriter depthWriter(outputFileDepth, m_codecName2Code(codecName), fps, cvSize(frame_width, frame_height), 1);
 
     context.StartGeneratingAll();
 
@@ -109,14 +106,13 @@ public:
       depthGen.GetMetaData(xDepthMap);
       XnDepthPixel* depthData = const_cast<XnDepthPixel*>(xDepthMap.Data());
       cv::Mat depth(frame_height, frame_width, CV_16U, reinterpret_cast<void*>(depthData));
-/*
-      //cvCvtScale();
-      cv::Mat outDepth(frame_height, frame_width, CV_8UC3);
-      //use c++ version
-      cvCvtColor(depth.ptr(), outDepth.ptr(), CV_8UC3);
-      cv::imwrite("out.png", outDepth );
-*/
-      //depthWriter << depth.clone();
+
+      cv::Mat depthMat8UC1;
+      depth.convertTo(depthMat8UC1, CV_8UC1);
+      // can be used for having different colors than grey
+      cv::Mat falseColorsMap;
+      cv::applyColorMap(depthMat8UC1, falseColorsMap, cv::COLORMAP_AUTUMN);
+      depthWriter << falseColorsMap;
     }
 
     context.StopGeneratingAll();
