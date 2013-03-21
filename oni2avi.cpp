@@ -196,8 +196,9 @@ int main( int argc, char* argv[] )
   //  return 1;
   //}
   catch (const std::exception& error) {
-    // OpenCV exceptions are derived from std::Exception
+    // OpenCV exceptions are derived from std::exception
     std::cout << error.what() << std::endl;
+    return 1;
   }
   catch (...) {
     std::cout << "Unknown error" << std::endl;
