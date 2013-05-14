@@ -1,4 +1,4 @@
-Copyright 2012, Kirill Lykov
+Copyright 2013, Kirill Lykov
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
