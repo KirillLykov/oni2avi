@@ -124,12 +124,12 @@ public:
       XnDepthPixel* depthData = const_cast<XnDepthPixel*>(xDepthMap.Data());
       cv::Mat depth(frame_height, frame_width, CV_16U, reinterpret_cast<void*>(depthData));
 
-      cv::Mat depthMat8UC1;
-      depth.convertTo(depthMat8UC1, CV_8UC1);
-      // can be used for having different colors than grey
       if (!depthAsPng)
       {
 #if (CV_MAJOR_VERSION == 2 && CV_MINOR_VERSION >= 4) || CV_MAJOR_VERSION > 2
+        cv::Mat depthMat8UC1;
+        depth.convertTo(depthMat8UC1, CV_8UC1);
+        // can be used for having different colors than grey
         cv::Mat falseColorsMap;
         cv::applyColorMap(depthMat8UC1, falseColorsMap, cv::COLORMAP_AUTUMN);
         depthWriter << falseColorsMap;
@@ -156,7 +156,7 @@ private:
   static void printResume(size_t nframes, const std::string& codecName,
       const std::string& inputFile, const std::string& outputFile) {
     std::cout << "Total: " << nframes << " frames. Used codec: " << codecName  <<
-        ".\n Input file name: " << inputFile << ". Output file name: " << outputFile << std::endl;
+        ".\n Input file name: " << inputFile << ". Output file name: " << outputFile << "-img/depth" << std::endl;
   }
 
   static std::string getFileNameNoExt(const std::string& outputFileName)
