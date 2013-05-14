@@ -11,6 +11,7 @@ SHELL = /bin/sh
 ROOT =  oni2avi
 EXE =   $(ROOT)
 
+# use /opt/... for MacOS and /usr/... for Ubuntu
 INCLUDES = -I/opt/local/include/ni -I/opt/local/include/opencv
 LIBS_PATH = -L/opt/local/lib/
 LIBS = -lOpenNI -lboost_program_options-mt -lopencv_video -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_contrib
