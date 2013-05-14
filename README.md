@@ -31,4 +31,6 @@ In addition to that, the following libraries must be installed:
 * OpenNI
 * OpenCV
 * boost
-Pathes to these libraries as well as related headers pathes must be specified in the Makefile.
+Pathes to these libraries as well as related headers pathes must be specified in the Makefile. 
+Note that I checked the code only with OpenNI 1.5.2.23, OpenCV 2.4.5, boost 1.53. So please use 
+the latests version of these libraries, it will not work with old version.
