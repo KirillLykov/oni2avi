@@ -22,7 +22,8 @@ The following options are available:
 Input-file must be a valid *.oni file, output-file is always avi file with extension,
 codec specifies available codecs (MPEG-1, MPEG-4, MPEG-4.2, MPEG-4.3, FLV1). The default
 codec is MPEG-4.2. Option depth-png allows to save depth frames as png images instead of avi file.
-The result of the program execution is two avi files for image and depth data.
+The result of the program execution is two avi files for image and depth data 
+or, in case of --depth-png=yes, avi file for images and a folder with *.png for depth.
 
 Linux and Mac OS X requirements
 --------------------------
@@ -34,5 +35,4 @@ In addition to that, the following libraries must be installed:
 * boost
 
 Paths to these libraries as well as related headers paths must be specified in the Makefile. 
-Note that I checked the code only with OpenNI 1.5.2.23, OpenCV 2.4.5/2.3, boost 1.53. So please use 
-the latest version of these libraries, it will not work with old version.
+Note that I checked the code only with OpenNI 1.5.2.23, OpenCV 2.4.5/2.3, boost 1.53, gcc 4.7.
