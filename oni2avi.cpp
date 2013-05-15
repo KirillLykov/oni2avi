@@ -16,6 +16,7 @@ namespace fs = boost::filesystem;
 
 // OpenNI
 #include <XnCppWrapper.h>
+#define THROW_IF_FAILED(retVal,message) {if (retVal != XN_STATUS_OK) throw message;}
 
 // OpenCV
 #include <opencv2/opencv.hpp>
@@ -26,7 +27,8 @@ class CodecName2FourCC
   typedef typename std::map<std::string, std::string>::iterator Iterator;
   Map m_codecName2FourCC;
 public:
-  CodecName2FourCC() {
+  CodecName2FourCC()
+  {
     m_codecName2FourCC["MPEG-1"] = "PIM1";
     m_codecName2FourCC["MPEG-4.2"] = "MP42";
     m_codecName2FourCC["MPEG-4.3"] = "DIV3";
@@ -34,7 +36,8 @@ public:
     m_codecName2FourCC["FLV1"] = "FLV1";
   }
 
-  int operator() (const std::string& codeName) {
+  int operator() (const std::string& codeName)
+  {
     Iterator it = m_codecName2FourCC.find(codeName);
     if (it == m_codecName2FourCC.end())
       throw "unknown codec name";
@@ -47,12 +50,14 @@ class Oni2AviConverter
 {
   CodecName2FourCC m_codecName2Code;
 public:
-  Oni2AviConverter() {
+  Oni2AviConverter()
+  {
 
   }
 
   void run(const std::string& codecName,
-           const std::string& inputFile, const std::string& outputFile, bool depthAsPng = false) {
+           const std::string& inputFile, const std::string& outputFile, bool depthAsPng = false)
+  {
 
     // TODO For the latest version of OpenCV, you may use HighGUI instead of using OpenNI
     // assumed that nframes, picture size for depth and images is the same
@@ -89,7 +94,8 @@ public:
     fs::path folderForDepthImages(depthFolderName);
     if (depthAsPng)
     {
-      if (fs::exists(folderForDepthImages) && !fs::is_directory(folderForDepthImages)) {
+      if (fs::exists(folderForDepthImages) && !fs::is_directory(folderForDepthImages))
+      {
         throw "Cannot create a directory because file with the same name exists. Remove it and try again";
       }
       if (!fs::exists(folderForDepthImages))
@@ -98,53 +104,62 @@ public:
       }
     }
 
-    context.StartGeneratingAll();
+    THROW_IF_FAILED(context.StartGeneratingAll(), "Could not start generating oni frames");
 
     size_t outStep = nframes / 10;
 
-    for(size_t iframe = 0; iframe < nframes; ++iframe)
+    try
     {
-      if ( iframe % outStep == 0 )
-          std::cout << iframe << "/" << nframes << std::endl;
-
-      // save image
-      imageGen.WaitAndUpdateData();
-      xn::ImageMetaData xImageMap;
-      imageGen.GetMetaData(xImageMap);
-      XnRGB24Pixel* imgData = const_cast<XnRGB24Pixel*>(xImageMap.RGB24Data());
-      cv::Mat image(frame_height, frame_width, CV_8UC3, reinterpret_cast<void*>(imgData));
-
-      cv::cvtColor(image, image, CV_BGR2RGB); // opencv image format is bgr
-      imgWriter << image.clone();
-
-      // save depth
-      depthGen.WaitAndUpdateData();
-      xn::DepthMetaData xDepthMap;
-      depthGen.GetMetaData(xDepthMap);
-      XnDepthPixel* depthData = const_cast<XnDepthPixel*>(xDepthMap.Data());
-      cv::Mat depth(frame_height, frame_width, CV_16U, reinterpret_cast<void*>(depthData));
-
-      if (!depthAsPng)
+      for(size_t iframe = 0; iframe < nframes; ++iframe)
       {
-#if (CV_MAJOR_VERSION == 2 && CV_MINOR_VERSION >= 4) || CV_MAJOR_VERSION > 2
-        cv::Mat depthMat8UC1;
-        depth.convertTo(depthMat8UC1, CV_8UC1);
-        // can be used for having different colors than grey
-        cv::Mat falseColorsMap;
-        cv::applyColorMap(depthMat8UC1, falseColorsMap, cv::COLORMAP_AUTUMN);
-        depthWriter << falseColorsMap;
-#else
-      throw "saving depth in avi file is not supported for opencv 2.3 or earlier. please use option --depth-png=yes";
-#endif
+        if ( iframe % outStep == 0 )
+            std::cout << iframe << "/" << nframes << std::endl;
+
+        // save image
+        THROW_IF_FAILED(imageGen.WaitAndUpdateData(), "WaitAndUpdateData failed");
+        xn::ImageMetaData xImageMap;
+        imageGen.GetMetaData(xImageMap);
+        XnRGB24Pixel* imgData = const_cast<XnRGB24Pixel*>(xImageMap.RGB24Data());
+        cv::Mat image(frame_height, frame_width, CV_8UC3, reinterpret_cast<void*>(imgData));
+
+        cv::cvtColor(image, image, CV_BGR2RGB); // opencv image format is bgr
+        imgWriter << image.clone();
+
+        // save depth
+        THROW_IF_FAILED(depthGen.WaitAndUpdateData(), "WaitAndUpdateData failed");
+        xn::DepthMetaData xDepthMap;
+        depthGen.GetMetaData(xDepthMap);
+        XnDepthPixel* depthData = const_cast<XnDepthPixel*>(xDepthMap.Data());
+        cv::Mat depth(frame_height, frame_width, CV_16U, reinterpret_cast<void*>(depthData));
+
+        if (!depthAsPng)
+        {
+  #if (CV_MAJOR_VERSION == 2 && CV_MINOR_VERSION >= 4) || CV_MAJOR_VERSION > 2
+          cv::Mat depthMat8UC1;
+          depth.convertTo(depthMat8UC1, CV_8UC1);
+          // can be used for having different colors than grey
+          cv::Mat falseColorsMap;
+          cv::applyColorMap(depthMat8UC1, falseColorsMap, cv::COLORMAP_AUTUMN);
+          depthWriter << falseColorsMap;
+  #else
+        throw "saving depth in avi file is not supported for opencv 2.3 or earlier. please use option --depth-png=yes";
+  #endif
+        }
+        else
+        {
+          // to_string is not supported by gcc4.7 so I don't use it here
+          //std::string imgNumAsStr = std::to_string(imgNum);
+          std::stringstream ss;
+          ss << depthFolderName << "/depth-" << iframe << ".png";
+          cv::imwrite(ss.str(), depth);
+        }
       }
-      else
-      {
-       // to_string is not supported by gcc4.7 so I don't use it here
-       //std::string imgNumAsStr = std::to_string(imgNum);
-       std::stringstream ss;
-       ss << depthFolderName << "/depth-" << iframe << ".png";
-       cv::imwrite(ss.str(), depth);
-      }
+    }
+    catch(...)
+    {
+      context.StopGeneratingAll();
+      context.Release();
+      throw;
     }
 
     context.StopGeneratingAll();
@@ -154,7 +169,8 @@ public:
 private:
 
   static void printResume(size_t nframes, const std::string& codecName,
-      const std::string& inputFile, const std::string& outputFile) {
+      const std::string& inputFile, const std::string& outputFile)
+  {
     std::cout << "Total: " << nframes << " frames. Used codec: " << codecName  <<
         ".\n Input file name: " << inputFile << ". Output file name: " << outputFile << "-img/depth" << std::endl;
   }
@@ -191,9 +207,10 @@ private:
   Oni2AviConverter& operator= (const Oni2AviConverter&);
 };
 
-int main( int argc, char* argv[] )
+int main(int argc, char* argv[])
 {
-  try {
+  try
+  {
     po::options_description desc("oni2avi converts an input oni file into 2 avi files - one for image and another for the depth map."
         "\n Allowed options:");
     desc.add_options()
@@ -213,7 +230,8 @@ int main( int argc, char* argv[] )
     po::store(po::command_line_parser(argc, argv).
               options(desc).positional(p).run(), vm);
 
-    if (vm.count("help")) {
+    if (vm.count("help"))
+    {
       std::cout << desc << "\n";
       return 1;
     }
@@ -229,7 +247,8 @@ int main( int argc, char* argv[] )
 
     bool depthAsPng = false;
     if (vm.count("depth-png"))
-      if (vm["depth-png"].as<std::string>() == "yes") {
+      if (vm["depth-png"].as<std::string>() == "yes")
+      {
         depthAsPng = true;
       }
 
@@ -238,21 +257,20 @@ int main( int argc, char* argv[] )
                   vm["input-file"].as<std::string>(),
                   vm["output-file"].as<std::string>(), depthAsPng);
   }
-  catch (const char* error) {
+  catch (const char* error)
+  {
     // oni2avi errors
     std::cout << "Error: " << error << ". Use --help for the list of available options." << std::endl;
     return 1;
   }
-  //catch () {
-    // OpenNI errors
-  //  return 1;
-  //}
-  catch (const std::exception& error) {
+  catch (const std::exception& error)
+  {
     // OpenCV exceptions are derived from std::exception
     std::cout << error.what() << std::endl;
     return 1;
   }
-  catch (...) {
+  catch (...)
+  {
     std::cout << "Unknown error" << std::endl;
     return 1;
   }
