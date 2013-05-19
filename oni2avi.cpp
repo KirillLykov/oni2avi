@@ -62,15 +62,16 @@ public:
     // TODO For the latest version of OpenCV, you may use HighGUI instead of using OpenNI
     // assumed that nframes, picture size for depth and images is the same
     xn::Context context;
-    context.Init();
+    THROW_IF_FAILED(context.Init(), "Could not init openni context");
 
     xn::Player player;
-    context.OpenFileRecording(inputFile.c_str(), player);
-    player.SetRepeat(false);
+
+    THROW_IF_FAILED(context.OpenFileRecording(inputFile.c_str(), player), "Could not open oni file recording");
+    THROW_IF_FAILED(player.SetRepeat(false), "Could not setRepeat for openni player");
 
     xn::ImageGenerator imageGen;
-    imageGen.Create( context );
-    imageGen.SetPixelFormat(XN_PIXEL_FORMAT_RGB24);
+    THROW_IF_FAILED(imageGen.Create(context), "Could not create openni image generator");
+    THROW_IF_FAILED(imageGen.SetPixelFormat(XN_PIXEL_FORMAT_RGB24), "Could not set pixel format for openni image generator");
     xn::ImageMetaData xImageMap2;
     imageGen.GetMetaData(xImageMap2);
     XnUInt32 fps = xImageMap2.FPS();
