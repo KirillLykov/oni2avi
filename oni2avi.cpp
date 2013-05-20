@@ -16,7 +16,7 @@ namespace fs = boost::filesystem;
 
 // OpenNI
 #include <XnCppWrapper.h>
-#define THROW_IF_FAILED(retVal,message) {if (retVal != XN_STATUS_OK) throw message;}
+#define THROW_IF_FAILED(retVal) {if (retVal != XN_STATUS_OK) throw xnGetStatusString(retVal);}
 
 // OpenCV
 #include <opencv2/opencv.hpp>
@@ -58,20 +58,21 @@ public:
   void run(const std::string& codecName,
            const std::string& inputFile, const std::string& outputFile, bool depthAsPng = false)
   {
-
     // TODO For the latest version of OpenCV, you may use HighGUI instead of using OpenNI
     // assumed that nframes, picture size for depth and images is the same
     xn::Context context;
-    THROW_IF_FAILED(context.Init(), "Could not init openni context");
+    THROW_IF_FAILED(context.Init());
 
     xn::Player player;
-
-    THROW_IF_FAILED(context.OpenFileRecording(inputFile.c_str(), player), "Could not open oni file recording");
-    THROW_IF_FAILED(player.SetRepeat(false), "Could not setRepeat for openni player");
+    THROW_IF_FAILED(context.OpenFileRecording(inputFile.c_str(), player));
+    THROW_IF_FAILED(player.SetRepeat(false));
 
     xn::ImageGenerator imageGen;
-    THROW_IF_FAILED(imageGen.Create(context), "Could not create openni image generator");
-    THROW_IF_FAILED(imageGen.SetPixelFormat(XN_PIXEL_FORMAT_RGB24), "Could not set pixel format for openni image generator");
+    THROW_IF_FAILED(imageGen.Create(context));
+    XnPixelFormat pixelFormat = imageGen.GetPixelFormat();
+    if (pixelFormat != XN_PIXEL_FORMAT_RGB24) {
+      THROW_IF_FAILED(imageGen.SetPixelFormat(XN_PIXEL_FORMAT_RGB24));
+    }
     xn::ImageMetaData xImageMap2;
     imageGen.GetMetaData(xImageMap2);
     XnUInt32 fps = xImageMap2.FPS();
@@ -105,7 +106,7 @@ public:
       }
     }
 
-    THROW_IF_FAILED(context.StartGeneratingAll(), "Could not start generating oni frames");
+    THROW_IF_FAILED(context.StartGeneratingAll());
 
     size_t outStep = nframes / 10;
 
@@ -117,7 +118,7 @@ public:
             std::cout << iframe << "/" << nframes << std::endl;
 
         // save image
-        THROW_IF_FAILED(imageGen.WaitAndUpdateData(), "WaitAndUpdateData failed");
+        THROW_IF_FAILED(imageGen.WaitAndUpdateData());
         xn::ImageMetaData xImageMap;
         imageGen.GetMetaData(xImageMap);
         XnRGB24Pixel* imgData = const_cast<XnRGB24Pixel*>(xImageMap.RGB24Data());
@@ -127,7 +128,7 @@ public:
         imgWriter << image.clone();
 
         // save depth
-        THROW_IF_FAILED(depthGen.WaitAndUpdateData(), "WaitAndUpdateData failed");
+        THROW_IF_FAILED(depthGen.WaitAndUpdateData());
         xn::DepthMetaData xDepthMap;
         depthGen.GetMetaData(xDepthMap);
         XnDepthPixel* depthData = const_cast<XnDepthPixel*>(xDepthMap.Data());
@@ -261,7 +262,7 @@ int main(int argc, char* argv[])
   catch (const char* error)
   {
     // oni2avi errors
-    std::cout << "Error: " << error << ". Use --help for the list of available options." << std::endl;
+    std::cout << "Error: " << error << std::endl;
     return 1;
   }
   catch (const std::exception& error)
