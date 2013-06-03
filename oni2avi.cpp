@@ -106,6 +106,10 @@ public:
       }
     }
 
+    std::vector<int> compression_params;
+    compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
+    compression_params.push_back(0);
+
     THROW_IF_FAILED(context.StartGeneratingAll());
 
     size_t outStep = nframes / 10;
@@ -153,7 +157,8 @@ public:
           //std::string imgNumAsStr = std::to_string(imgNum);
           std::stringstream ss;
           ss << depthFolderName << "/depth-" << iframe << ".png";
-          cv::imwrite(ss.str(), depth);
+
+          cv::imwrite(ss.str(), depth, compression_params);
         }
       }
     }
