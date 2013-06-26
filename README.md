@@ -14,13 +14,15 @@ Command line syntax
 --------------------------
 
 The following options are available:
---help
---input-file
---output-file
---codec
---depth-png
+
+* --help
+* --input-file
+* --output-file
+* --codec
+* --depth-png
+
 Input-file must be a valid *.oni file, output-file is always avi file with extension,
-codec specifies available codecs (MPEG-1, MPEG-4, MPEG-4.2, MPEG-4.3, FLV1). The default
+codec might be MPEG-1, MPEG-4, MPEG-4.2, MPEG-4.3, FLV1. The default
 codec is MPEG-4.2. Option depth-png allows to save depth frames as png images instead of avi file.
 The result of the program execution is two avi files for image and depth data 
 or, in case of --depth-png=yes, avi file for images and a folder with *.png for depth.
