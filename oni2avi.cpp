@@ -158,6 +158,10 @@ public:
           std::stringstream ss;
           ss << depthFolderName << "/depth-" << iframe << ".png";
 
+          //double minVal, maxVal;
+          //cv::Point minloc, maxloc;
+          //cv::minMaxLoc(depth, &minVal, &maxVal, &minloc, &maxloc);
+
           cv::imwrite(ss.str(), depth, compression_params);
         }
       }

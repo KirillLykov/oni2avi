@@ -11,9 +11,18 @@ SHELL = /bin/sh
 ROOT =  oni2avi
 EXE =   $(ROOT)
 
-# use /opt/... for MacOS and /usr/... for Ubuntu
-INCLUDES = -I/opt/local/include/ni -I/opt/local/include/opencv
-LIBS_PATH = -L/opt/local/lib/
+
+UNAME := $(shell uname)
+
+ifeq ($(UNAME), Linux)
+    INCLUDES = -I/usr/local/include/ni -I/usr/local/include/opencv
+    LIBS_PATH = -L/usr/local/lib/
+endif
+ifeq ($(UNAME), Darwin)
+    INCLUDES = -I/opt/local/include/ni -I/opt/local/include/opencv
+    LIBS_PATH = -L/opt/local/lib/
+endif
+
 LIBS = -lOpenNI -lboost_system-mt -lboost_program_options-mt -lboost_filesystem-mt -lopencv_video -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_contrib
 
 CC = g++
