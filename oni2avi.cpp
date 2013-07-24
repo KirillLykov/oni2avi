@@ -46,6 +46,19 @@ public:
   }
 };
 
+std::ostream& operator << (std::ostream& stream, const XnVersion& item)
+{
+  stream << static_cast<int>(item.nMajor) << "." << static_cast<int>(item.nMinor) << "." << item.nMaintenance << ". Build " << item.nBuild;
+  return stream;
+}
+
+std::ostream& operator << (std::ostream& stream, const XnProductionNodeDescription& item)
+{
+  stream << "\t OpenNI version used for recording: " << item.Version << std::endl;
+  stream << "\t Type: " << item.Type << ". Generator name:  " << item.strName << ". Vendor: " << item.strVendor << "." << std::endl;
+  return stream;
+}
+
 class Oni2AviConverter
 {
   CodecName2FourCC m_codecName2Code;
@@ -85,6 +98,7 @@ public:
     player.GetNumFrames(depthGen.GetName(), nframes);
 
     printResume(nframes, codecName, inputFile, outputFile);
+    printFileInfo(depthGen);
 
     std::string outputFileImg, outputFileDepth;
     getOutputFileNames(outputFile, outputFileImg, outputFileDepth);
@@ -112,7 +126,7 @@ public:
 
     THROW_IF_FAILED(context.StartGeneratingAll());
 
-    size_t outStep = nframes / 10;
+    size_t outStep = nframes > 10 ? nframes / 10 : 1;
 
     try
     {
@@ -128,7 +142,7 @@ public:
         XnRGB24Pixel* imgData = const_cast<XnRGB24Pixel*>(xImageMap.RGB24Data());
         cv::Mat image(frame_height, frame_width, CV_8UC3, reinterpret_cast<void*>(imgData));
 
-        cv::cvtColor(image, image, CV_BGR2RGB); // opencv image format is bgr
+        cv::cvtColor(image, image, CV_BGR2RGB); // opencv image format is BGR
         imgWriter << image.clone();
 
         // save depth
@@ -158,10 +172,6 @@ public:
           std::stringstream ss;
           ss << depthFolderName << "/depth-" << iframe << ".png";
 
-          //double minVal, maxVal;
-          //cv::Point minloc, maxloc;
-          //cv::minMaxLoc(depth, &minVal, &maxVal, &minloc, &maxloc);
-
           cv::imwrite(ss.str(), depth, compression_params);
         }
       }
@@ -184,6 +194,17 @@ private:
   {
     std::cout << "Total: " << nframes << " frames. Used codec: " << codecName  <<
         ".\n Input file name: " << inputFile << ". Output file name: " << outputFile << "-img/depth" << std::endl;
+  }
+
+  static void printFileInfo(const xn::DepthGenerator& depthGen)
+  {
+    xn::NodeInfo nin = depthGen.GetInfo();
+    if ((XnNodeInfo*)nin == 0)
+      throw "Could not read DepthGenerator info. Probably, the input file is corrupted";
+
+    XnProductionNodeDescription description = nin.GetDescription();
+    std::cout << "Input file info:" << std::endl;
+    std::cout << description;
   }
 
   static std::string getFileNameNoExt(const std::string& outputFileName)
