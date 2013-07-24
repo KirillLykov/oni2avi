@@ -54,8 +54,8 @@ std::ostream& operator << (std::ostream& stream, const XnVersion& item)
 
 std::ostream& operator << (std::ostream& stream, const XnProductionNodeDescription& item)
 {
-  stream << "\t OpenNI version used for recording: " << item.Version << std::endl;
-  stream << "\t Type: " << item.Type << ". Generator name:  " << item.strName << ". Vendor: " << item.strVendor << "." << std::endl;
+  stream << "\tOpenNI version: " << item.Version << std::endl;
+  stream << "\tType: " << item.Type << ". Generator name:  " << item.strName << ". Vendor: " << item.strVendor << "." << std::endl;
   return stream;
 }
 
@@ -97,11 +97,10 @@ public:
     XnUInt32 nframes;
     player.GetNumFrames(depthGen.GetName(), nframes);
 
-    printResume(nframes, codecName, inputFile, outputFile);
-    printFileInfo(depthGen);
-
     std::string outputFileImg, outputFileDepth;
     getOutputFileNames(outputFile, outputFileImg, outputFileDepth);
+
+    printResume(nframes, codecName, inputFile, outputFileImg, depthGen);
 
     cv::VideoWriter imgWriter(outputFileImg, m_codecName2Code(codecName), fps, cvSize(frame_width, frame_height), 1);
     cv::VideoWriter depthWriter(outputFileDepth, m_codecName2Code(codecName), fps, cvSize(frame_width, frame_height), 1);
@@ -190,20 +189,17 @@ public:
 private:
 
   static void printResume(size_t nframes, const std::string& codecName,
-      const std::string& inputFile, const std::string& outputFile)
+      const std::string& inputFile, const std::string& outputFile, const xn::DepthGenerator& depthGen)
   {
-    std::cout << "Total: " << nframes << " frames. Used codec: " << codecName  <<
-        ".\n Input file name: " << inputFile << ". Output file name: " << outputFile << "-img/depth" << std::endl;
-  }
+    std::cout <<
+        "Input file name: " << inputFile << ". Output file name: " << outputFile
+        << ".\n\tTotal: " << nframes << " frames. Used codec: " << codecName << std::endl;
 
-  static void printFileInfo(const xn::DepthGenerator& depthGen)
-  {
     xn::NodeInfo nin = depthGen.GetInfo();
     if ((XnNodeInfo*)nin == 0)
       throw "Could not read DepthGenerator info. Probably, the input file is corrupted";
 
     XnProductionNodeDescription description = nin.GetDescription();
-    std::cout << "Input file info:" << std::endl;
     std::cout << description;
   }
 
