@@ -102,13 +102,17 @@ public:
 
     printResume(nframes, codecName, inputFile, outputFileImg, depthGen);
 
+    //check permissions to write in the current directory
+    //fs::path currentFolder("./");
+    //fs::file_status st = fs::status(currentFolder);
+    //std::cout << (st.permissions() & fs::all_all) << std::endl;
+
     cv::VideoWriter imgWriter(outputFileImg, m_codecName2Code(codecName), fps, cvSize(frame_width, frame_height), 1);
     cv::VideoWriter depthWriter;
     if (!depthAsPng)
       depthWriter.open(outputFileDepth, m_codecName2Code(codecName), fps, cvSize(frame_width, frame_height), 1);
 
-    std::string depthFolderName = getDepthFolderName(outputFileImg);
-    fs::path folderForDepthImages(depthFolderName);
+    fs::path folderForDepthImages = getDepthFolderName(outputFileImg);
     if (depthAsPng)
     {
       if (fs::exists(folderForDepthImages) && !fs::is_directory(folderForDepthImages))
@@ -171,7 +175,7 @@ public:
           // to_string is not supported by gcc4.7 so I don't use it here
           //std::string imgNumAsStr = std::to_string(imgNum);
           std::stringstream ss;
-          ss << depthFolderName << "/depth-" << iframe << ".png";
+          ss << folderForDepthImages.string() << "/depth-" << iframe << ".png";
 
           cv::imwrite(ss.str(), depth, compression_params);
         }
@@ -205,32 +209,24 @@ private:
     std::cout << description;
   }
 
-  static std::string getFileNameNoExt(const std::string& outputFileName)
-  {
-    size_t index = outputFileName.find_last_of('.');
-    std::string nameWithoutExtension;
-    if (index == std::string::npos)
-      nameWithoutExtension = outputFileName;
-    nameWithoutExtension = outputFileName.substr(0, index);
-    std::string extention = outputFileName.substr(index + 1);
-    if (extention != "avi")
-      throw "output file extention must be avi";
-    return nameWithoutExtension;
-  }
-
   static void getOutputFileNames(const std::string& outputFileName, std::string& outputFileImg,
                                  std::string& outputFileDepth)
   {
-    std::string nameWithoutExtension = getFileNameNoExt(outputFileName);
+    fs::path outPath(outputFileName);
+    if (outPath.extension() != ".avi")
+      throw "output file extention must be avi";
+
+    std::string nameWithoutExtension = outPath.stem().string();
 
     outputFileImg = nameWithoutExtension + "-img.avi";
     outputFileDepth = nameWithoutExtension + "-depth.avi";
   }
 
-  static std::string getDepthFolderName(const std::string& outputFileName)
+  static fs::path getDepthFolderName(fs::path outPath)
   {
-    std::string nameWithoutExtension = getFileNameNoExt(outputFileName);
-    return nameWithoutExtension + "-depth";
+    fs::path fnNoExt = outPath.stem();
+    fnNoExt += "-depth";
+    return fnNoExt;
   }
 
   Oni2AviConverter(const Oni2AviConverter&);
