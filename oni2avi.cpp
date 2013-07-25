@@ -103,7 +103,9 @@ public:
     printResume(nframes, codecName, inputFile, outputFileImg, depthGen);
 
     cv::VideoWriter imgWriter(outputFileImg, m_codecName2Code(codecName), fps, cvSize(frame_width, frame_height), 1);
-    cv::VideoWriter depthWriter(outputFileDepth, m_codecName2Code(codecName), fps, cvSize(frame_width, frame_height), 1);
+    cv::VideoWriter depthWriter;
+    if (!depthAsPng)
+      depthWriter.open(outputFileDepth, m_codecName2Code(codecName), fps, cvSize(frame_width, frame_height), 1);
 
     std::string depthFolderName = getDepthFolderName(outputFileImg);
     fs::path folderForDepthImages(depthFolderName);
