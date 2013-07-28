@@ -225,8 +225,8 @@ private:
   static fs::path getDepthFolderName(fs::path outPath)
   {
     fs::path fnNoExt = outPath.stem();
-    fnNoExt += "-depth";
-    return fnNoExt;
+    //fnNoExt += "-depth"; cannot use it because boost 1.48 doesn't have operator +=
+    return fs::path(fnNoExt.string() + "-depth");
   }
 
   Oni2AviConverter(const Oni2AviConverter&);
