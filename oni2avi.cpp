@@ -161,7 +161,7 @@ public:
         {
   #if (CV_MAJOR_VERSION == 2 && CV_MINOR_VERSION >= 4) || CV_MAJOR_VERSION > 2
           cv::Mat depthMat8UC1;
-          depth.convertTo(depthMat8UC1, CV_8UC1);
+          depth.convertTo(depthMat8UC1, CV_8UC1, 255.0f/4096.0f);
           // can be used for having different colors than grey
           cv::Mat falseColorsMap;
           cv::applyColorMap(depthMat8UC1, falseColorsMap, cv::COLORMAP_AUTUMN);
