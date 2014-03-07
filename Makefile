@@ -13,19 +13,24 @@ EXE =   $(ROOT)
 
 
 UNAME := $(shell uname)
+CC = g++
 
 ifeq ($(UNAME), Linux)
     INCLUDES = -I/usr/local/include/ni -I/usr/local/include/opencv
     LIBS_PATH = -L/usr/local/lib/
 endif
 ifeq ($(UNAME), Darwin)
-    INCLUDES = -I/opt/local/include/ni -I/opt/local/include/opencv
+    INCLUDES = -I/opt/local/include/ni -I/opt/local/include/opencv -I/opt/local/include
     LIBS_PATH = -L/opt/local/lib/
+	#if default gcc, try to use clang
+	#GCCVERSION = $(shell gcc --version | grep ^gcc | sed 's/^.* //g')
+	#ifeq ("$(GCCVERSION)", "4.2.1")
+	#	CC = clang
+	#endif
 endif
 
 LIBS = -lOpenNI -lboost_system-mt -lboost_program_options-mt -lboost_filesystem-mt -lopencv_video -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_contrib
 
-CC = g++
 CCFLAGS = -O2
 LINK = g++
 SRC = oni2src.cpp

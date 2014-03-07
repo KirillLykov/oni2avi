@@ -21,6 +21,10 @@ namespace fs = boost::filesystem;
 // OpenCV
 #include <opencv2/opencv.hpp>
 
+/**
+ * @class
+ *  Helper class for tackling codec names
+ */
 class CodecName2FourCC
 {
   typedef std::map<std::string, std::string> Map;
@@ -59,6 +63,62 @@ std::ostream& operator << (std::ostream& stream, const XnProductionNodeDescripti
   return stream;
 }
 
+/**
+ * @class
+ *  Normalize colors in depth using histogram as proposed by user Vlad:
+ *  http://stackoverflow.com/questions/17944590/convert-kinects-depth-to-rgb
+ */
+class HistogramNormalizer
+{
+public:
+  static void run(cv::Mat& input)
+  {
+    // smth like
+    // should give the same result but is not
+    //cv::equalizeHist(depthMat8UC1, depth2);
+
+    std::vector<float> histogram;
+    calculateHistogram(input, histogram);
+    cv::MatIterator_<short> it = input.begin<short>(), it_end = input.end<short>();
+    for(; it != it_end; ++it) {
+      *it = histogram[*it];
+    }
+  }
+
+private:
+  static void calculateHistogram(const cv::Mat& depth, std::vector<float>& histogram)
+  {
+    int depthTypeSize = CV_ELEM_SIZE(depth.type());
+    int histogramSize = pow(2, 8 * depthTypeSize);
+    histogram.resize(histogramSize, 0.0f);
+
+    unsigned int nNumberOfPoints = 0;
+    cv::MatConstIterator_<short> it = depth.begin<short>(), it_end = depth.end<short>();
+    for(; it != it_end; ++it) {
+      if (*it != 0) {
+        histogram[*it]++;
+        nNumberOfPoints++;
+      }
+    }
+
+    for (int nIndex = 1; nIndex < histogramSize; nIndex++)
+    {
+      histogram[nIndex] += histogram[nIndex - 1];
+    }
+    if (nNumberOfPoints)
+    {
+      for (int nIndex=1; nIndex<histogramSize; nIndex++)
+      {
+        histogram[nIndex] = (256 * (1.0f - (histogram[nIndex] / nNumberOfPoints)));
+      }
+    }
+  }
+};
+
+/**
+ * @class
+ *  Does oni file to avi or images convertion
+ */
 class Oni2AviConverter
 {
   CodecName2FourCC m_codecName2Code;
@@ -157,11 +217,14 @@ public:
         XnDepthPixel* depthData = const_cast<XnDepthPixel*>(xDepthMap.Data());
         cv::Mat depth(frame_height, frame_width, CV_16U, reinterpret_cast<void*>(depthData));
 
+        HistogramNormalizer::run(depth);
+
         if (!depthAsPng)
         {
   #if (CV_MAJOR_VERSION == 2 && CV_MINOR_VERSION >= 4) || CV_MAJOR_VERSION > 2
           cv::Mat depthMat8UC1;
-          depth.convertTo(depthMat8UC1, CV_8UC1, 255.0f/4096.0f);
+          depth.convertTo(depthMat8UC1, CV_8UC1);//, 255.0f/4096.0f);
+
           // can be used for having different colors than grey
           cv::Mat falseColorsMap;
           cv::applyColorMap(depthMat8UC1, falseColorsMap, cv::COLORMAP_AUTUMN);
