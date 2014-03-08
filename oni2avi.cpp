@@ -106,7 +106,7 @@ private:
       histogram[nIndex] += histogram[nIndex - 1];
     }
 
-    if (nNumberOfPoints)
+    if (nNumberOfPoints != 0)
     {
       for (int nIndex = 1; nIndex < histogramSize; ++nIndex)
       {
@@ -118,7 +118,7 @@ private:
 
 /**
  * @class
- *  Does oni file to avi or images convertion
+ *  Convert oni file to avi or images
  */
 class Oni2AviConverter
 {
@@ -218,13 +218,12 @@ public:
         XnDepthPixel* depthData = const_cast<XnDepthPixel*>(xDepthMap.Data());
         cv::Mat depth(frame_height, frame_width, CV_16U, reinterpret_cast<void*>(depthData));
 
-        HistogramNormalizer::run(depth);
-
         if (!depthAsPng)
         {
   #if (CV_MAJOR_VERSION == 2 && CV_MINOR_VERSION >= 4) || CV_MAJOR_VERSION > 2
+          HistogramNormalizer::run(depth);
           cv::Mat depthMat8UC1;
-          depth.convertTo(depthMat8UC1, CV_8UC1);//, 255.0f/4096.0f);
+          depth.convertTo(depthMat8UC1, CV_8UC1);
 
           // can be used for having different colors than grey
           cv::Mat falseColorsMap;
