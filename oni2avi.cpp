@@ -67,16 +67,16 @@ std::ostream& operator << (std::ostream& stream, const XnProductionNodeDescripti
  * @class
  *  Normalize colors in depth using histogram as proposed by user Vlad:
  *  http://stackoverflow.com/questions/17944590/convert-kinects-depth-to-rgb
+ *  The original idea is from
+ *  https://github.com/OpenNI/OpenNI2/blob/master/Samples/Common/OniSampleUtilities.h
  */
 class HistogramNormalizer
 {
 public:
   static void run(cv::Mat& input)
   {
-    // smth like
-    // should give the same result but is not
-    //cv::equalizeHist(depthMat8UC1, depth2);
-
+    // TODO smth like cv::equalizeHist(depthMat8UC1, depth2);
+    // should give the same result but is not. Check it out
     std::vector<float> histogram;
     calculateHistogram(input, histogram);
     cv::MatIterator_<short> it = input.begin<short>(), it_end = input.end<short>();
@@ -96,20 +96,21 @@ private:
     cv::MatConstIterator_<short> it = depth.begin<short>(), it_end = depth.end<short>();
     for(; it != it_end; ++it) {
       if (*it != 0) {
-        histogram[*it]++;
-        nNumberOfPoints++;
+        ++histogram[*it];
+        ++nNumberOfPoints;
       }
     }
 
-    for (int nIndex = 1; nIndex < histogramSize; nIndex++)
+    for (int nIndex = 1; nIndex < histogramSize; ++nIndex)
     {
       histogram[nIndex] += histogram[nIndex - 1];
     }
+
     if (nNumberOfPoints)
     {
-      for (int nIndex=1; nIndex<histogramSize; nIndex++)
+      for (int nIndex = 1; nIndex < histogramSize; ++nIndex)
       {
-        histogram[nIndex] = (256 * (1.0f - (histogram[nIndex] / nNumberOfPoints)));
+        histogram[nIndex] = (256.0 * (1.0f - (histogram[nIndex] / nNumberOfPoints)));
       }
     }
   }
