@@ -28,7 +28,7 @@ namespace fs = boost::filesystem;
 class CodecName2FourCC
 {
   typedef std::map<std::string, std::string> Map;
-  typedef typename std::map<std::string, std::string>::iterator Iterator;
+  typedef std::map<std::string, std::string>::iterator Iterator;
   Map m_codecName2FourCC;
 public:
   CodecName2FourCC()
@@ -89,7 +89,7 @@ private:
   static void calculateHistogram(const cv::Mat& depth, std::vector<float>& histogram)
   {
     int depthTypeSize = CV_ELEM_SIZE(depth.type());
-    int histogramSize = pow(2, 8 * depthTypeSize);
+    int histogramSize = pow(2., 8 * depthTypeSize);
     histogram.resize(histogramSize, 0.0f);
 
     unsigned int nNumberOfPoints = 0;
