@@ -27,15 +27,37 @@ codec is MPEG-4.2. Option depth-png allows to save depth frames as png images in
 The result of the program execution is two avi files for image and depth data 
 or, in case of --depth-png=yes, avi file for images and a folder with *.png for depth.
 
-Linux and Mac OS X requirements
+Requirements & installation
 --------------------------
 
-In order to build oni2avi using provided makefile, user need to have gcc version 4.6 or newer.
-In addition to that, the following libraries must be installed:
-* OpenNI
+The following libraries must be installed in order to build oni2avi:
+* OpenNI 1.x
 * OpenCV
-* boost
+* Boost
 
 Paths to these libraries as well as related headers paths must be specified in the Makefile. 
+Alternatively, it's possible to use CMake to build oni2avi. In case all the necessary libraries
+are installed, CMake will find them automatically.
+
 Note that I checked the code only with OpenNI 1.5.2.23, OpenCV 2.4.5/2.3, boost 1.53, gcc 4.7,
 under MacOS > 10.6 and Ubuntu > 12.
+
+Building with make (Linux, Mac OS X)
+--------------------------
+
+```bash
+git clone git://github.com/KirillLykov/oni2avi.git
+cd oni2avi
+make
+```
+
+Building with CMake (Windows, Linux, Mac OS X)
+--------------------------
+
+```bash
+git clone git://github.com/KirillLykov/oni2avi.git
+cd oni2avi
+mkdir build && cd build
+cmake ../
+make
+```
