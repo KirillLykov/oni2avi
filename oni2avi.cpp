@@ -1,5 +1,6 @@
 // (C) Copyright Kirill Lykov 2013.
 //
+// Contributed author Vadim Frolov
 // Distributed under the FreeBSD Software License (See accompanying file license.txt)
 
 #include <iostream>

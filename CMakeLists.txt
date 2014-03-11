@@ -1,3 +1,7 @@
+# (C) Copyright Vadim Frolov 2014.
+#
+# Distributed under the FreeBSD Software License (See accompanying file license.txt)
+
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 project(oni2mov)
