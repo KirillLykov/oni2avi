@@ -39,17 +39,8 @@ Paths to these libraries as well as related headers paths must be specified in t
 Alternatively, it's possible to use CMake to build oni2avi. In case all the necessary libraries
 are installed, CMake will find them automatically.
 
-Note that I checked the code only with OpenNI 1.5.2.23, OpenCV 2.4.5/2.3, boost 1.53, gcc 4.7,
+Note that I checked the code only with OpenNI 1.5.2.23, OpenCV 2.4.5/2.3, boost > 1.40, gcc 4.7,
 under MacOS > 10.6 and Ubuntu > 12.
-
-Building with make (Linux, Mac OS X)
---------------------------
-
-```bash
-git clone git://github.com/KirillLykov/oni2avi.git
-cd oni2avi
-make
-```
 
 Building with CMake (Windows, Linux, Mac OS X)
 --------------------------
@@ -61,3 +52,13 @@ mkdir build && cd build
 cmake ../
 make
 ```
+
+Building with make (Linux, Mac OS X)
+--------------------------
+
+```bash
+git clone git://github.com/KirillLykov/oni2avi.git
+cd oni2avi
+make
+```
+Note, that if you are using MacOS with macports, it is a recommended option. Otherwise, `cmake` should be simpler.
