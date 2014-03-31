@@ -4,10 +4,10 @@
 
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-project(oni2mov)
+project(oni2avi)
 
 ### ---[ Find universal dependencies
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/" ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" ${CMAKE_MODULE_PATH})
 
 # ---[ Release/Debug specific flags
 if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
@@ -25,5 +25,5 @@ endif()
 include_directories(${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} ${OPENNI_INCLUDES} ${OPENNI2_INCLUDES} ${OPENNI_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
 
-add_executable (oni2mov oni2avi.cpp)
-target_link_libraries(oni2mov ${OpenCV_LIBS} ${Boost_LIBRARIES} ${OPENNI_LIBRARIES})
+add_executable (oni2avi oni2avi.cpp)
+target_link_libraries(oni2avi ${OpenCV_LIBS} ${Boost_LIBRARIES} ${OPENNI_LIBRARIES})

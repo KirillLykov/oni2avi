@@ -262,7 +262,7 @@ private:
       const std::string& inputFile, const std::string& outputFile, const xn::DepthGenerator& depthGen)
   {
     std::cout <<
-        "Input file name: " << inputFile << ". Output file name: " << outputFile
+        "Input file name: " << inputFile << ".\nOutput file name: " << outputFile
         << ".\n\tTotal: " << nframes << " frames. Used codec: " << codecName << std::endl;
 
     xn::NodeInfo nin = depthGen.GetInfo();
@@ -280,7 +280,7 @@ private:
     if (outPath.extension() != ".avi")
       throw "output file extention must be avi";
 
-    std::string nameWithoutExtension = outPath.stem().string();
+    std::string nameWithoutExtension = (outPath.parent_path() / outPath.stem()).string();
 
     outputFileImg = nameWithoutExtension + "-img.avi";
     outputFileDepth = nameWithoutExtension + "-depth.avi";
