@@ -226,12 +226,13 @@ public:
         XnDepthPixel* depthData = const_cast<XnDepthPixel*>(xDepthMap.Data());
         cv::Mat depth(frame_height, frame_width, CV_16U, reinterpret_cast<void*>(depthData));
         
-        //Saving depth frames
-		std::ostringstream oss2;
-        oss2 << "depth-" << iframe;
-        std::string depth_mat = oss2.str();
-		cv::FileStorage file(depth_mat,cv::FileStorage::WRITE);
-		file << depth_mat<<depth ; 
+        // Contributed by user alexmylonas: "Added functionality to extract high quality images and depth map"
+        // saving depth frames
+	std::ostringstream oss;
+        oss << "depth-" << iframe;
+        std::string depth_mat = oss.str();
+	cv::FileStorage file(depth_mat, cv::FileStorage::WRITE);
+	file << depth_mat << depth; 
         
         if (!depthAsPng)
         {
@@ -254,7 +255,6 @@ public:
           //std::string imgNumAsStr = std::to_string(imgNum);
           std::stringstream ss;
           ss << folderForDepthImages.string() << "/depth-" << iframe << ".png";
-
           cv::imwrite(ss.str(), depth, compression_params);
         }
       }
