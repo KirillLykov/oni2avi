@@ -2,13 +2,13 @@
 //
 // Contributed author Vadim Frolov
 // Distributed under the FreeBSD Software License (See accompanying file license.txt)
-
+ 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <map>
-
+#include <vector>
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
 
@@ -171,6 +171,7 @@ public:
 
     cv::VideoWriter imgWriter(outputFileImg, m_codecName2Code(codecName), fps, cvSize(frame_width, frame_height), 1);
     cv::VideoWriter depthWriter;
+    
     if (!depthAsPng)
       depthWriter.open(outputFileDepth, m_codecName2Code(codecName), fps, cvSize(frame_width, frame_height), 1);
 
@@ -200,9 +201,10 @@ public:
       for(size_t iframe = 0; iframe < nframes; ++iframe)
       {
         if ( iframe % outStep == 0 )
-            std::cout << iframe << "/" << nframes << std::endl;
+		std::cout << iframe << "/" << nframes << std::endl;
 
         // save image
+        
         THROW_IF_FAILED(imageGen.WaitAndUpdateData());
         xn::ImageMetaData xImageMap;
         imageGen.GetMetaData(xImageMap);
@@ -210,6 +212,11 @@ public:
         cv::Mat image(frame_height, frame_width, CV_8UC3, reinterpret_cast<void*>(imgData));
 
         cv::cvtColor(image, image, CV_BGR2RGB); // opencv image format is BGR
+        //Saving Image frames
+        std::ostringstream oss;
+        oss << "rgb-" << iframe << ".ppm";
+        std::string color_mat = oss.str();
+		cv::imwrite(color_mat,image);
         imgWriter << image.clone();
 
         // save depth
@@ -218,7 +225,14 @@ public:
         depthGen.GetMetaData(xDepthMap);
         XnDepthPixel* depthData = const_cast<XnDepthPixel*>(xDepthMap.Data());
         cv::Mat depth(frame_height, frame_width, CV_16U, reinterpret_cast<void*>(depthData));
-
+        
+        //Saving depth frames
+		std::ostringstream oss2;
+        oss2 << "depth-" << iframe;
+        std::string depth_mat = oss2.str();
+		cv::FileStorage file(depth_mat,cv::FileStorage::WRITE);
+		file << depth_mat<<depth ; 
+        
         if (!depthAsPng)
         {
   #if (CV_MAJOR_VERSION == 2 && CV_MINOR_VERSION >= 4) || CV_MAJOR_VERSION > 2
