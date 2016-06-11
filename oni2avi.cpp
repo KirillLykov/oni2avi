@@ -204,7 +204,6 @@ public:
 		std::cout << iframe << "/" << nframes << std::endl;
 
         // save image
-        
         THROW_IF_FAILED(imageGen.WaitAndUpdateData());
         xn::ImageMetaData xImageMap;
         imageGen.GetMetaData(xImageMap);
@@ -213,10 +212,10 @@ public:
 
         cv::cvtColor(image, image, CV_BGR2RGB); // opencv image format is BGR
         //Saving Image frames
-        std::ostringstream oss;
-        oss << "rgb-" << iframe << ".ppm";
-        std::string color_mat = oss.str();
-		cv::imwrite(color_mat,image);
+        std::ostringstream ss_img;
+        ss_img << "rgb-" << iframe << ".ppm";
+        std::string color_mat = ss_img.str();
+	cv::imwrite(color_mat,image);
         imgWriter << image.clone();
 
         // save depth
@@ -228,9 +227,9 @@ public:
         
         // Contributed by user alexmylonas: "Added functionality to extract high quality images and depth map"
         // saving depth frames
-	std::ostringstream oss;
-        oss << "depth-" << iframe;
-        std::string depth_mat = oss.str();
+	std::ostringstream ss_depth;
+        ss_depth << "depth-" << iframe;
+        std::string depth_mat = ss_depth.str();
 	cv::FileStorage file(depth_mat, cv::FileStorage::WRITE);
 	file << depth_mat << depth; 
         
