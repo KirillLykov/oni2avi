@@ -13,15 +13,15 @@ EXE =   $(ROOT)
 
 
 UNAME := $(shell uname)
-CC = g++
+CC = clang++
 
 ifeq ($(UNAME), Linux)
-    INCLUDES = -I/usr/local/include/ni -I/usr/local/include/opencv
+    INCLUDES = -I/usr/local/include/ni2 -I/usr/local/include/opencv
     LIBS_PATH = -L/usr/local/lib/
 endif
 ifeq ($(UNAME), Darwin)
-    INCLUDES = -I/opt/local/include/ni -I/opt/local/include/opencv -I/opt/local/include
-    LIBS_PATH = -L/opt/local/lib/
+    INCLUDES = -I/usr/local/include/ -I/usr/local/include/ni2/
+    LIBS_PATH = -L/usr/local/lib/ni2 -L/usr/local/lib/
 	#if default gcc, try to use clang
 	#GCCVERSION = $(shell gcc --version | grep ^gcc | sed 's/^.* //g')
 	#ifeq ("$(GCCVERSION)", "4.2.1")
@@ -29,10 +29,10 @@ ifeq ($(UNAME), Darwin)
 	#endif
 endif
 
-LIBS = -lOpenNI -lboost_system-mt -lboost_program_options-mt -lboost_filesystem-mt -lopencv_video -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_contrib
+LIBS = -lOpenNI2 -lboost_system-mt -lboost_program_options-mt -lboost_filesystem-mt -lopencv_video -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_contrib
 
-CCFLAGS = -O2
-LINK = g++
+CCFLAGS = -std=c++11 -O0 -g
+LINK = clang++
 SRC = oni2src.cpp
 OBJ = oni2avi.o
 
@@ -43,4 +43,4 @@ $(EXE):	$(OBJ)
 	$(CC) $(CCFLAGS) $(INCLUDES) -c $<
 
 clean:
-	rm -fr $(ROOT) *.o *.d
+	rm -fr $(ROOT) *.o *.d *.dSYM
