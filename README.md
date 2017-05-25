@@ -31,7 +31,7 @@ Requirements & installation
 --------------------------
 
 The following libraries must be installed in order to build oni2avi:
-* OpenNI 1.x
+* OpenNI 1.x (for v2 check out branch openni2)
 * OpenCV
 * Boost
 
@@ -39,7 +39,7 @@ Paths to these libraries as well as related headers paths must be specified in t
 Alternatively, it's possible to use CMake to build oni2avi. In case all the necessary libraries
 are installed, CMake will find them automatically.
 
-Note that I checked the code only with OpenNI 1.5.2.23, OpenCV 2.4.5/2.3, boost > 1.40, gcc 4.7,
+Note that I checked the code only with OpenNI 1.5 (for v2, try openni2 branch), OpenCV 2.4.5/2.3, boost > 1.40, gcc 4.7,
 under MacOS > 10.6 and Ubuntu > 12.
 
 Building with CMake (Windows, Linux, Mac OS X)
