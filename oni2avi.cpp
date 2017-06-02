@@ -187,14 +187,18 @@ class Oni2AviConverter
         //fs::path currentFolder("./");
         //fs::file_status st = fs::status(currentFolder);
         //std::cout << (st.permissions() & fs::all_all) << std::endl;
+        boost::filesystem::wpath file(outputFileImg); 
+        if(boost::filesystem::exists(file)) 
+            boost::filesystem::remove(file); 
+        file = outputFileDepth;        
+        if(!depthAsPng && boost::filesystem::exists(file)) 
+            boost::filesystem::remove(file);
 
         cv::VideoWriter imgWriter(outputFileImg, m_codecName2Code(codecName), fps, cvSize(frame_width, frame_height), 1);
         if (!imgWriter.isOpened())
             std::cout << "Output video could not be opened" << std::endl;
-        
 
         cv::VideoWriter depthWriter;
-
         if (!depthAsPng)
             depthWriter.open(outputFileDepth, m_codecName2Code(codecName), fps, cvSize(frame_width, frame_height), 1);
 
