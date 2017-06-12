@@ -30,17 +30,32 @@ or, in case of --depth-png=yes, avi file for images and a folder with *.png for 
 Requirements & installation
 --------------------------
 
+NOTE: I checked build scripts (make/cmake) only for MacOS with homebrew, so in case if you are using different setup, 
+you might need to modify path to the dependencies (in Makefile or CMakeList.txt).
+
 The following libraries must be installed in order to build oni2avi:
-* OpenNI 1.x (for v2 check out branch openni2)
-* OpenCV
+* OpenNI 2.x
+* OpenCV 3.x
 * Boost
 
 Paths to these libraries as well as related headers paths must be specified in the Makefile. 
 Alternatively, it's possible to use CMake to build oni2avi. In case all the necessary libraries
 are installed, CMake will find them automatically.
 
-Note that I checked the code only with OpenNI 1.5 (for v2, try openni2 branch), OpenCV 2.4.5/2.3, boost > 1.40, gcc 4.7,
-under MacOS > 10.6 and Ubuntu > 12.
+Note that I checked the code only with OpenNI 2.0, OpenCV 3, boost > 1.59, clang 3,
+under MacOS >= 10.9.
+
+Legacy version for old OpenNI and OpenCV
+--------------------------
+Legacy version working with  openni 1.5 and opencv3 might be found in branch legacy:
+```bash
+git clone git://github.com/KirillLykov/oni2avi.git
+cd oni2avi
+git checkout legacy
+mkdir build && cd build
+cmake ../
+make
+```
 
 Building with CMake (Windows, Linux, Mac OS X)
 --------------------------
